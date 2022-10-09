@@ -3,7 +3,8 @@ import Axios from 'axios'
 
 
 // export const apiConstant = "https://api.kredi.com.tr";
-export const apiConstant = "http://37.148.212.29:8085";
+export const apiConstant = "http://localhost:58073";
+// export const apiConstant = "http://37.148.212.29:8085";
 export const antegraSystem = "http://localhost:2354/api/";
 
 const masterUrl = apiConstant + "/api/";
@@ -14,7 +15,7 @@ export const GetWithToken = async (url) => {
     {
         headers: {
             'Content-Type': 'application/Json',
-            Authorization: 'Bearer ' + localStorage.getItem("usrtknbalotetknenter")
+            Authorization: 'Bearer ' + localStorage.getItem("dgbrdconftknserr")
         }
     }
     try {
@@ -76,15 +77,13 @@ export const PostWithToken = async (url, data) => {
     {
         headers: {
             'Content-Type': 'application/Json',
-            Authorization: 'Bearer ' + localStorage.getItem("usrtknbalotetknenter")
+            Authorization: 'Bearer ' + localStorage.getItem("dgbrdconftknserr")
         },
         onUploadProgress: progressEvent => {
             
             let percentCompleted = Math.round(
                 (progressEvent.loaded * 100) / progressEvent.total
               );
-        
-           
         }
     }
     try {
@@ -101,7 +100,7 @@ export const PostWithTokenFile = async (url, data) => {
     {
         headers: {
             "Content-Type": "multipart/form-data" ,
-            Authorization: 'Bearer ' + localStorage.getItem("usrtknbalotetknenter")
+            Authorization: 'Bearer ' + localStorage.getItem("dgbrdconftknserr")
         },
     }
 

@@ -13,7 +13,7 @@ export default function Login() {
 
 
     useEffect(()=>{
-     localStorage.removeItem("usrtknbalotetknenter");
+     localStorage.removeItem("dgbrdconftknserr");
     },[])
     const login = async () => {
         setButtonLoad(true)
@@ -31,7 +31,7 @@ export default function Login() {
             return false;
         }
 
-        localStorage.setItem("usrtknbalotetknenter", d.token)
+        localStorage.setItem("dgbrdconftknserr", d.token)
 
         location.reload();
     }
