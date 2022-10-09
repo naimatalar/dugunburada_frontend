@@ -1,0 +1,28 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.firm-detail-box-field{
+  font-size: 14px;
+  border-bottom: 2px dashed #32414873;
+  padding-bottom: 6px;
+  padding-top: 6px;
+  background: #26a69a2b;
+}
+.firm-detail-box{
+  box-shadow: 1px 17px 26px -9px black;
+    padding: 18px;
+}
