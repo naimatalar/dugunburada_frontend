@@ -177,7 +177,7 @@ function Layout({ children, permissionControl = true }) {
                             <div>  <a href="#" className="dropdown-item"><i className="icon-user-plus"></i> Ayarlar</a></div>
                             <div><a href="#" className="dropdown-item"><i className="icon-cog5"></i> Kullanıcılar</a></div>
 
-                            <div><a href="#" onClick={() => { localStorage.removeItem("usrtknbalotetknenter"); location.reload(); }} className="dropdown-item"><i className="icon-switch2"></i> Çıkış</a></div>
+                            <div><a href="#" onClick={() => { localStorage.removeItem("dgbrdconftknserr"); location.reload(); }} className="dropdown-item"><i className="icon-switch2"></i> Çıkış</a></div>
                         </DropdownMenu>
                     </Dropdown>
 
