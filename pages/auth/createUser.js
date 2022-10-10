@@ -6,7 +6,7 @@ import { PostNoneToken } from '../api/crud';
 //     }
 export default function CreateUser() {
     useEffect(() => {
-        localStorage.removeItem("usrtknbalotetknenter");
+        localStorage.removeItem("dgbrdconftknserr");
 
     }, [])
 
