@@ -145,7 +145,7 @@ export default function Index() {
                                     <ol className='rounded-list'>
                                         {roles.map((item, key) => {
                                             if (selectedRoles?.id == item.id) {
-                                                return <li onClick={() => { GetMenuModules(item) }} key={key} style={{ cursor: "pointer" }} className='act' ><a>{">>"} {item.name}</a></li>
+                                                return <li onClick={() => { GetMenuModules(item) }} key={key} style={{ cursor: "pointer" }} className='act' ><a style={{fontWeight:"bold"}}>{">>"} {item.name}</a></li>
 
                                             } else {
                                                 return <li onClick={() => { GetMenuModules(item) }} key={key} style={{ cursor: "pointer" }}><a >{item.name}</a></li>

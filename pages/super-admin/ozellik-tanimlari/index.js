@@ -1,0 +1,291 @@
+
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import AlertFunction from '../../../components/alertfunction';
+import DataTable from '../../../components/datatable';
+import Layout from '../../../layout/layout';
+import PageHeader from '../../../layout/pageheader';
+import PageLoading from '../../../layout/pageLoading';
+import Image from "next/image"
+import { Modal, ModalBody, ModalHeader, Tooltip } from 'reactstrap';
+import { fileUploadUrl, GetWithToken, PostWithToken, PostWithTokenFile } from '../../api/crud';
+
+
+export default function Index() {
+    const [modalOpen, setModelOpen] = useState(false)
+    const [initialData, setInitialData] = useState({ id: null })
+    const [hiddenPassordField, setHiddenPassordField] = useState(false)
+    const [refresh, setRefresh] = useState(null)
+
+    const [loading, setLoading] = useState(true)
+    const [refreshDataTable, setRefreshDatatable] = useState(null)
+    const [file, setFile] = useState(null)
+    const [selectedkind, setSelectedKind] = useState(1)
+    const [selectedkindText, setSelectedKindText] = useState("Fiyatlandırma")
+
+    useEffect(() => {
+
+        start();
+    }, [])
+    const start = async () => {
+
+        setLoading(false)
+    }
+
+    const submit = async (val) => {
+        var dataId = null;
+        if (val.id == undefined) {
+            var d = await PostWithToken("CompanyProperty/Create", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            if (d.isError) {
+                alert(d.message)
+            } else {
+
+                // dataId = d.data.id
+            }
+
+        } else {
+            var d = await PostWithToken("CompanyProperty/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+
+            if (d.isError) {
+                alert(d.message)
+            } else {
+                // dataId = d.data.id
+            }
+        }
+
+        if (file) {
+            var d = await PostWithTokenFile("FileUpload/Upload", { name: "file", data: file }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+
+            await PostWithToken("Company/UploadFile", { fileName: d.data.fileName, id: dataId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+
+        }
+        setRefreshDatatable(new Date())
+    }
+
+    const deleteData = async (data) => {
+        var d = await GetWithToken("CompanyProperty/delete/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        if (d.isError) {
+            alert(d.message)
+        }
+        setRefreshDatatable(new Date())
+
+    }
+
+
+    const editData = async (data) => {
+      
+        var d = await GetWithToken("CompanyProperty/getById/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("", e.response.data); return false })
+
+        setInitialData(d.data)
+
+        setRefresh(new Date())
+        setModelOpen(true)
+    }
+
+    return (
+        <>{
+            loading && <PageLoading></PageLoading>
+        }
+
+            <Modal isOpen={modalOpen}
+                size="lg"
+                toggle={() => setModelOpen(!modalOpen)}
+                modalTransition={{ timeout: 100 }}>
+                <ModalHeader cssModule={{ 'modal-title': 'w-100 text-center' }}>
+                    <div className="d-flex justify-content-center mb-2">
+                    </div>
+                    <div className="d-flex ">
+                        <p>{selectedkindText} <b>Tanımlama</b> Formu</p>
+                    </div>
+                    <button onClick={() => setModelOpen(!modalOpen)} type='button' className='modal-close-button btn btn-danger btn-sm p-1'><i className='fas fa-times'></i></button>
+
+                </ModalHeader>  <ModalBody>
+                    <Formik
+                        initialValues={initialData}
+                        validate={values => {
+                            const errors = {};
+
+                            if (!values.key) {
+                                errors.key = 'Bu alan zorunludur';
+                            }
+                            if (!values.companyPropertyValueType) {
+                                errors.companyPropertyValueType = 'Bu alan zorunludur';
+                            }
+
+                            return errors;
+                        }}
+                        onSubmit={(values, { setSubmitting }) => {
+                            values.companyPropertyKind=selectedkind
+                            setTimeout(async () => {
+                                await submit(values)
+                                setSubmitting(false);
+                                setModelOpen(!modalOpen)
+                            }, 400);
+                        }}
+                    >
+                        {({ isSubmitting, isValidating, handleChange, handleBlur, setFieldValue, values }) => (
+                            <Form className='row mt-3 col-12 form-n-popup' >
+                                {initialData && <>
+                                    <ErrorMessage name="id" component="div" className='text-danger' />
+                                    <Field type="hidden" name="id" />
+
+                                    <div className='col-md-6 col-12  mb-3'>
+                                        <ErrorMessage name="key" component="div" className='text-danger danger-alert-form' />
+                                        <label className='input-label'>Özellik</label>
+                                        <Field type="text" id="key" className="form-control" name="key" />
+                                    </div>
+                                    <div className='col-md-6 col-12  mb-3'>
+                                        <ErrorMessage name="companyPropertyValueType" component="companyPropertyValueType" className='text-danger danger-alert-form' />
+                                        <label className='input-label'>Özellik Tipi</label>
+                                        <select style={{ width: "100%", padding: 7 }} name='companyPropertyValueType' id='companyPropertyValueType' onChange={handleChange} onBlur={handleBlur} value={values.companyPropertyValueType}>
+                                        <option value={""}>
+                                               Seçiniz
+                                            </option>
+                                            <option value={1}>
+                                                Yazı
+                                            </option>
+                                            <option value={2}>
+                                                Sayısal
+                                            </option>
+                                            <option value={3}>
+                                                Para
+                                            </option>
+                                            <option value={4}>
+                                                Var/Yok
+                                            </option>
+                                        </select>
+
+                                    </div>
+                                    <div className='col-md-6 col-12  mb-3'>
+                                        <ErrorMessage name="isDefault" component="div" className='text-danger danger-alert-form' />
+                                        <label className='input-label'>Bütün Firmalar İçin</label>
+                                        <Field type="checkbox" id="isDefault" className="form-control" name="isDefault" />
+                                        
+                                    </div>
+
+                                    <div className='col-md-6 col-12  mb-3'>
+                                        <ErrorMessage name=".sPrimary" component="div" className='text-danger danger-alert-form' />
+                                        <label className='input-label'>Birincil</label>
+                                        <Field type="checkbox" id="isPrimary" className="form-control" name="isPrimary" />
+                                    </div>
+
+                                    <div className='col-md-6 col-12  mb-3'>
+                                        <ErrorMessage name="isOnlyValue" component="div" className='text-danger danger-alert-form' />
+                                        <label className='input-label'>Sadece Değer</label>
+                                        <Field type="checkbox" id="isOnlyValue" className="form-control" name="isOnlyValue"  />
+                                    </div>
+
+
+
+
+                                    <div className='row col-12  mt-4'>
+                                        <div className='col-md-3 col-12 mt-1 '>
+                                            <button type='submit' disabled={isSubmitting} className={"btn btn-primary btn-block loading-button" + (isSubmitting && " loading-button")}><span>Kaydet <i className="icon-circle-right2 ml-2"></i></span></button>
+                                        </div>
+                                        <div className='col-md-3 col-12 mt-1'>
+                                            <button type='button' onClick={() => { toggleModal() }} className={"btn btn-warning btn-block "}><span>Kapat <i className="fas fa-undo ml-2"></i></span></button>
+                                        </div>
+                                    </div>
+                                </>}
+                            </Form>
+                        )}
+                    </Formik>
+                </ModalBody>
+            </Modal>
+
+
+            <Layout>
+                <PageHeader title="Firma Özellikleri" map={[
+                    { url: "", name: "Süper Admin" },
+                    { url: "", name: "ÖzellikTanımları" }
+                ]}>
+
+                </PageHeader>
+                <div className='content pr-3 pl-3 d-flex'>
+                    <div className='sidebar sidebar-light sidebar-secondary sidebar-expand-md'>
+                        <div className='sidebar-content'>
+                            <div className='card'>
+
+
+                                <div className='card-header bg-transparent header-elements-inline row'>
+                                    <div className='row'>
+                                        <h2><b>Gruplar</b></h2>
+                                        Yetki Vermek istediğiniz grubu seçiniz
+
+                                        {/* <span></span> */}
+                                    </div>
+                                </div>
+
+
+
+                                <div className='card-body'>
+                                    {/* 
+                                    <ol class="rounded-list">
+                                        <li><a href="">List item</a></li>
+                                        <li><a href="">List item</a></li>
+
+                                        <li><a href="">List item</a></li>
+                                        <li><a href="">List item</a></li>
+                                    </ol> */}
+
+                                    <ol className='rounded-list'>
+                                        <li onClick={() => { setSelectedKind(1);setRefreshDatatable(new Date()) ; setSelectedKindText("Fiyatlandırma")}} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 1 && 'act' ||"slc_"} ><a style={selectedkind == 1 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 1 && ">>"} Fiyatlandırma</a></li>
+                                        <li onClick={() => { setSelectedKind(2);setRefreshDatatable(new Date()) ; setSelectedKindText("Teknik ve Lokasyon Özellikleri") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 2 && 'act'||"slc_"} ><a style={selectedkind == 2 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 2 && ">>"} Teknik ve Lokasyon Özellikleri</a></li>
+                                        <li onClick={() => { setSelectedKind(3);setRefreshDatatable(new Date()) ; setSelectedKindText("Hizmet ve Organizasyon") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 3 && 'act'||"slc_"} ><a style={selectedkind == 3 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 3 && ">>"} Hizmet ve Organizasyon</a></li>
+                                        <li onClick={() => { setSelectedKind(4);setRefreshDatatable(new Date()) ; setSelectedKindText("Kapasite Bilgileri") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 4 && 'act'||"slc_"} ><a style={selectedkind == 4 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 4 && ">>"} Kapasite Bilgileri</a></li>
+                                        <li onClick={() => { setSelectedKind(5);setRefreshDatatable(new Date()) ; setSelectedKindText("Genel Özellikler") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 5 && 'act'||"slc_"} ><a style={selectedkind == 5 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 5 && ">>"} Genel Özellikler</a></li>
+                                        <li onClick={() => { setSelectedKind(6);setRefreshDatatable(new Date()) ; setSelectedKindText("Sık Sorulan Sorular") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 6 && 'act'||"slc_"} ><a style={selectedkind == 6 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 6 && ">>"} Sık Sorulan Sorular</a></li>
+                                        <li onClick={() => { setSelectedKind(7);setRefreshDatatable(new Date()) ; setSelectedKindText("Hakkinda") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 7 && 'act'||"slc_"} ><a style={selectedkind == 7 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 7 && ">>"} Hakkinda</a></li>
+
+
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className='content'>
+                        <div className='content pl-4 pt-3'>
+                            <div className='col'>
+
+                                <DataTable Refresh={refreshDataTable} DataUrl={"CompanyProperty/GetAllByCompanyPropertyKind/" + selectedkind} Headers={[
+                                    ["key", "Özellik"],
+                                    ["companyPropertyValueTypeString", "Özellik Tipi"],
+                                    {
+                                        header: <span>Birincil</span>,
+                                        dynamicButton: (data) => {  return <span title='Seçili' ><i className={data.isPrimary&&'fas fa-check'||'fas fa-times'}></i> </span> }
+                                    },
+                                    {
+                                        header: <span>Bütün Firmalar İçin</span>,
+                                        dynamicButton: (data) => {  return <span title='Seçili' ><i className={data.isDefault&&'fas fa-check'||'fas fa-times'}></i> </span> }
+                                    },
+                                          {
+                                        header: <span>Sadece Değer</span>,
+                                        dynamicButton: (data) => {  return <span title='Seçili' ><i className={data.isOnlyValue&&'fas fa-check'||'fas fa-times'}></i> </span> }
+                                    },
+                                   
+                                ]} Title={<span>{selectedkindText} Listesi</span>}
+                                    Description={selectedkindText + " Firma kayıtlarında düzenleme ve ekleme işlemini burdan yapabilirsiniz"}
+                                    HeaderButton={{
+                                        text: "Yeni Ekle", action: () => {
+                                            setModelOpen(!modalOpen)
+                                            setInitialData({})
+                                        }
+                                    }}
+                                    EditButton={editData}
+                                    DeleteButton={deleteData}
+                                // Pagination={{ pageNumber: 1, pageSize: 10 }}
+                                ></DataTable>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </Layout>
+        </>
+    )
+
+}
