@@ -22,13 +22,20 @@ export default function Index() {
     const [file, setFile] = useState(null)
     const [selectedkind, setSelectedKind] = useState(1)
     const [selectedkindText, setSelectedKindText] = useState("Fiyatlandırma")
+    const [selectedCompanyType, setSelectedCompanyType] = useState()
+    const [selectedCompanyTypeText, setSelectedCompanyTypeText] = useState()
+    const [companyTypeList, setCompanyTypeList] = useState([])
 
     useEffect(() => {
 
         start();
     }, [])
     const start = async () => {
+        var d = await GetWithToken("CompanyType/GetCompanyType").then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
 
+        setSelectedCompanyType(d.data[0].id)
+        setSelectedCompanyTypeText(d.data[0].name)
+        setCompanyTypeList(d.data)
         setLoading(false)
     }
 
@@ -53,12 +60,7 @@ export default function Index() {
             }
         }
 
-        if (file) {
-            var d = await PostWithTokenFile("FileUpload/Upload", { name: "file", data: file }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
 
-            await PostWithToken("Company/UploadFile", { fileName: d.data.fileName, id: dataId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
-
-        }
         setRefreshDatatable(new Date())
     }
 
@@ -73,7 +75,7 @@ export default function Index() {
 
 
     const editData = async (data) => {
-      
+
         var d = await GetWithToken("CompanyProperty/getById/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("", e.response.data); return false })
 
         setInitialData(d.data)
@@ -88,7 +90,7 @@ export default function Index() {
         }
 
             <Modal isOpen={modalOpen}
-                size="lg"
+                size="md"
                 toggle={() => setModelOpen(!modalOpen)}
                 modalTransition={{ timeout: 100 }}>
                 <ModalHeader cssModule={{ 'modal-title': 'w-100 text-center' }}>
@@ -115,7 +117,9 @@ export default function Index() {
                             return errors;
                         }}
                         onSubmit={(values, { setSubmitting }) => {
-                            values.companyPropertyKind=selectedkind
+                            values.companyPropertyKind = selectedkind
+                            values.companyTypeId = selectedCompanyType
+
                             setTimeout(async () => {
                                 await submit(values)
                                 setSubmitting(false);
@@ -138,8 +142,8 @@ export default function Index() {
                                         <ErrorMessage name="companyPropertyValueType" component="companyPropertyValueType" className='text-danger danger-alert-form' />
                                         <label className='input-label'>Özellik Tipi</label>
                                         <select style={{ width: "100%", padding: 7 }} name='companyPropertyValueType' id='companyPropertyValueType' onChange={handleChange} onBlur={handleBlur} value={values.companyPropertyValueType}>
-                                        <option value={""}>
-                                               Seçiniz
+                                            <option value={""}>
+                                                Seçiniz
                                             </option>
                                             <option value={1}>
                                                 Yazı
@@ -156,26 +160,14 @@ export default function Index() {
                                         </select>
 
                                     </div>
-                                    <div className='col-md-6 col-12  mb-3'>
+                                    <div className='col-12  mb-3'>
                                         <ErrorMessage name="isDefault" component="div" className='text-danger danger-alert-form' />
-                                        <label className='input-label'>Bütün Firmalar İçin</label>
-                                        <Field type="checkbox" id="isDefault" className="form-control" name="isDefault" />
-                                        
+                                        <label className='mr-4'><Field type="checkbox" id="isDefault" name="isDefault" />Bütün Firmalar İçin </label>
+                                        <label className='mr-4' ><Field type="checkbox" id="isPrimary" name="isPrimary" /> Birincil </label>
+                                        <label className='mr-4'>   <Field type="checkbox" id="isOnlyValue" name="isOnlyValue" /> Sadece Değer</label>
+
+
                                     </div>
-
-                                    <div className='col-md-6 col-12  mb-3'>
-                                        <ErrorMessage name=".sPrimary" component="div" className='text-danger danger-alert-form' />
-                                        <label className='input-label'>Birincil</label>
-                                        <Field type="checkbox" id="isPrimary" className="form-control" name="isPrimary" />
-                                    </div>
-
-                                    <div className='col-md-6 col-12  mb-3'>
-                                        <ErrorMessage name="isOnlyValue" component="div" className='text-danger danger-alert-form' />
-                                        <label className='input-label'>Sadece Değer</label>
-                                        <Field type="checkbox" id="isOnlyValue" className="form-control" name="isOnlyValue"  />
-                                    </div>
-
-
 
 
                                     <div className='row col-12  mt-4'>
@@ -208,9 +200,18 @@ export default function Index() {
 
 
                                 <div className='card-header bg-transparent header-elements-inline row'>
-                                    <div className='row'>
-                                        <h2><b>Gruplar</b></h2>
-                                        Yetki Vermek istediğiniz grubu seçiniz
+                                    <div className='row' style={{width:"100%"}}>
+                                        <h2><b>Firma Türü</b></h2>
+                                        <div className='row' style={{width:"100%"}}>
+                                            <select style={{width:"100%",padding:5}}  onChange={(x)=>{setSelectedCompanyType(x.target.value);setRefreshDatatable(new Date())}}>
+                                                {companyTypeList.map((item, key) => {
+                                                    return <option key={key} value={item.id}>
+                                                        {item.name}
+                                                    </option>
+                                                })}
+                                            </select>
+
+                                        </div>
 
                                         {/* <span></span> */}
                                     </div>
@@ -229,13 +230,13 @@ export default function Index() {
                                     </ol> */}
 
                                     <ol className='rounded-list'>
-                                        <li onClick={() => { setSelectedKind(1);setRefreshDatatable(new Date()) ; setSelectedKindText("Fiyatlandırma")}} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 1 && 'act' ||"slc_"} ><a style={selectedkind == 1 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 1 && ">>"} Fiyatlandırma</a></li>
-                                        <li onClick={() => { setSelectedKind(2);setRefreshDatatable(new Date()) ; setSelectedKindText("Teknik ve Lokasyon Özellikleri") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 2 && 'act'||"slc_"} ><a style={selectedkind == 2 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 2 && ">>"} Teknik ve Lokasyon Özellikleri</a></li>
-                                        <li onClick={() => { setSelectedKind(3);setRefreshDatatable(new Date()) ; setSelectedKindText("Hizmet ve Organizasyon") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 3 && 'act'||"slc_"} ><a style={selectedkind == 3 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 3 && ">>"} Hizmet ve Organizasyon</a></li>
-                                        <li onClick={() => { setSelectedKind(4);setRefreshDatatable(new Date()) ; setSelectedKindText("Kapasite Bilgileri") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 4 && 'act'||"slc_"} ><a style={selectedkind == 4 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 4 && ">>"} Kapasite Bilgileri</a></li>
-                                        <li onClick={() => { setSelectedKind(5);setRefreshDatatable(new Date()) ; setSelectedKindText("Genel Özellikler") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 5 && 'act'||"slc_"} ><a style={selectedkind == 5 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 5 && ">>"} Genel Özellikler</a></li>
-                                        <li onClick={() => { setSelectedKind(6);setRefreshDatatable(new Date()) ; setSelectedKindText("Sık Sorulan Sorular") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 6 && 'act'||"slc_"} ><a style={selectedkind == 6 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 6 && ">>"} Sık Sorulan Sorular</a></li>
-                                        <li onClick={() => { setSelectedKind(7);setRefreshDatatable(new Date()) ; setSelectedKindText("Hakkinda") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 7 && 'act'||"slc_"} ><a style={selectedkind == 7 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 7 && ">>"} Hakkinda</a></li>
+                                        <li onClick={() => { setSelectedKind(1); setRefreshDatatable(new Date()); setSelectedKindText("Fiyatlandırma") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 1 && 'act' || "slc_"} ><a style={selectedkind == 1 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 1 && ">>"} Fiyatlandırma</a></li>
+                                        <li onClick={() => { setSelectedKind(2); setRefreshDatatable(new Date()); setSelectedKindText("Teknik ve Lokasyon Özellikleri") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 2 && 'act' || "slc_"} ><a style={selectedkind == 2 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 2 && ">>"} Teknik ve Lokasyon Özellikleri</a></li>
+                                        <li onClick={() => { setSelectedKind(3); setRefreshDatatable(new Date()); setSelectedKindText("Hizmet ve Organizasyon") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 3 && 'act' || "slc_"} ><a style={selectedkind == 3 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 3 && ">>"} Hizmet ve Organizasyon</a></li>
+                                        <li onClick={() => { setSelectedKind(4); setRefreshDatatable(new Date()); setSelectedKindText("Kapasite Bilgileri") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 4 && 'act' || "slc_"} ><a style={selectedkind == 4 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 4 && ">>"} Kapasite Bilgileri</a></li>
+                                        <li onClick={() => { setSelectedKind(5); setRefreshDatatable(new Date()); setSelectedKindText("Genel Özellikler") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 5 && 'act' || "slc_"} ><a style={selectedkind == 5 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 5 && ">>"} Genel Özellikler</a></li>
+                                        <li onClick={() => { setSelectedKind(6); setRefreshDatatable(new Date()); setSelectedKindText("Sık Sorulan Sorular") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 6 && 'act' || "slc_"} ><a style={selectedkind == 6 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 6 && ">>"} Sık Sorulan Sorular</a></li>
+                                        <li onClick={() => { setSelectedKind(7); setRefreshDatatable(new Date()); setSelectedKindText("Hakkinda") }} style={{ cursor: "pointer", textAlign: "center" }} className={selectedkind == 7 && 'act' || "slc_"} ><a style={selectedkind == 7 && { fontWeight: "bold" } || { fontWeight: "normal" }}>{selectedkind == 7 && ">>"} Hakkinda</a></li>
 
 
                                     </ol>
@@ -248,22 +249,22 @@ export default function Index() {
                         <div className='content pl-4 pt-3'>
                             <div className='col'>
 
-                                <DataTable Refresh={refreshDataTable} DataUrl={"CompanyProperty/GetAllByCompanyPropertyKind/" + selectedkind} Headers={[
+                                {selectedCompanyType && <DataTable Refresh={refreshDataTable} DataUrl={"CompanyProperty/GetAllByCompanyPropertyKind/" + selectedkind + "/" + selectedCompanyType} Headers={[
                                     ["key", "Özellik"],
                                     ["companyPropertyValueTypeString", "Özellik Tipi"],
                                     {
                                         header: <span>Birincil</span>,
-                                        dynamicButton: (data) => {  return <span title='Seçili' ><i className={data.isPrimary&&'fas fa-check'||'fas fa-times'}></i> </span> }
+                                        dynamicButton: (data) => { return <span title='Seçili' ><i className={data.isPrimary && 'fas fa-check' || 'fas fa-times'}></i> </span> }
                                     },
                                     {
                                         header: <span>Bütün Firmalar İçin</span>,
-                                        dynamicButton: (data) => {  return <span title='Seçili' ><i className={data.isDefault&&'fas fa-check'||'fas fa-times'}></i> </span> }
+                                        dynamicButton: (data) => { return <span title='Seçili' ><i className={data.isDefault && 'fas fa-check' || 'fas fa-times'}></i> </span> }
                                     },
-                                          {
+                                    {
                                         header: <span>Sadece Değer</span>,
-                                        dynamicButton: (data) => {  return <span title='Seçili' ><i className={data.isOnlyValue&&'fas fa-check'||'fas fa-times'}></i> </span> }
+                                        dynamicButton: (data) => { return <span title='Seçili' ><i className={data.isOnlyValue && 'fas fa-check' || 'fas fa-times'}></i> </span> }
                                     },
-                                   
+
                                 ]} Title={<span>{selectedkindText} Listesi</span>}
                                     Description={selectedkindText + " Firma kayıtlarında düzenleme ve ekleme işlemini burdan yapabilirsiniz"}
                                     HeaderButton={{
@@ -275,7 +276,7 @@ export default function Index() {
                                     EditButton={editData}
                                     DeleteButton={deleteData}
                                 // Pagination={{ pageNumber: 1, pageSize: 10 }}
-                                ></DataTable>
+                                ></DataTable>}
                             </div>
 
 
