@@ -3082,3 +3082,25 @@ float: left;
     font-weight: bold !important;
 
 }
+.active-icon{
+background-color: rgb(24, 141, 0);
+height: 25px;
+width: 27px;
+line-height: 25px;
+padding-top: 5px;
+border-radius: 50%;
+display: block;
+text-align: center;
+color: white;
+}
+.passive-icon{
+    background-color: rgb(141, 0, 0);
+    height: 25px;
+    width: 27px;
+    line-height: 25px;
+    padding-top: 5px;
+    border-radius: 50%;
+    display: block;
+    text-align: center;
+    color: white;
+    }

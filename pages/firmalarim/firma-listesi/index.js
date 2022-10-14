@@ -9,10 +9,13 @@ import PageLoading from '../../../layout/pageLoading';
 import Image from "next/image"
 import { Modal, ModalBody, ModalHeader, Tooltip } from 'reactstrap';
 import { fileUploadUrl, GetWithToken, PostWithToken, PostWithTokenFile } from '../../api/crud';
+import CompanyProperty from '../../../components/CompanyProperty';
 
 
 export default function Index() {
     const [modalOpen, setModelOpen] = useState(false)
+    const [propertyModal, setPropertyModal] = useState(false)
+
     const [initialData, setInitialData] = useState({ id: null })
     const [hiddenPassordField, setHiddenPassordField] = useState(false)
     const [refresh, setRefresh] = useState(null)
@@ -20,8 +23,9 @@ export default function Index() {
     const [refreshDataTable, setRefreshDatatable] = useState(null)
     const [file, setFile] = useState(null)
     const [companyTypeList, setCompanyTypeList] = useState([])
+    const [selectedComapnyId, setSelectedComapnyId] = useState()
 
-
+    const [selectedCompanyPropertyTypeId, setSelectedCompanyTypeId] = useState()
 
     useEffect(() => {
 
@@ -98,7 +102,7 @@ export default function Index() {
             loading && <PageLoading></PageLoading>
         }
 
-
+            {propertyModal && <CompanyProperty companyId={selectedComapnyId} modalOpen={propertyModal} companyPropertyTypeId={selectedCompanyPropertyTypeId} setModelOpen={setPropertyModal}></CompanyProperty>}
 
             <Modal isOpen={modalOpen}
                 size="sm"
@@ -175,15 +179,12 @@ export default function Index() {
                                             </div>
                                         }
                                     </div>
-
-
-
                                     <div className='row col-12  mt-4'>
                                         <div className='col-md-6 col-12 mt-1 '>
                                             <button type='submit' disabled={isSubmitting} className={"btn btn-primary btn-block loading-button" + (isSubmitting && " loading-button")}><span>Kaydet <i className="icon-circle-right2 ml-2"></i></span></button>
                                         </div>
                                         <div className='col-md-6 col-12 mt-1'>
-                                            <button type='button' onClick={() => { toggleModal() }} className={"btn btn-warning btn-block "}><span>Kapat <i className="fas fa-undo ml-2"></i></span></button>
+                                            <button type='button' onClick={() => {  setModelOpen(!modalOpen) }} className={"btn btn-warning btn-block "}><span>Kapat <i className="fas fa-undo ml-2"></i></span></button>
                                         </div>
                                     </div>
                                 </>}
@@ -192,6 +193,9 @@ export default function Index() {
                     </Formik>
                 </ModalBody>
             </Modal>
+
+
+
 
 
             <Layout>
@@ -206,8 +210,20 @@ export default function Index() {
                 <div className='content pr-3 pl-3'>
                     <div className='card'>
                         <DataTable Refresh={refreshDataTable} DataUrl={"Company/GetByCurrentUser"} Headers={[
-                            ["name", "Firma Adı"],
-                            ["companyCount", "Firma Türü"],
+                            ["companyName", "Firma Adı"],
+                            ["companyType", "Firma Türü"],
+                            {
+                                header: <span>Yayında mı</span>,
+                                dynamicButton: (data) => { return <span title='yayın' ><i className={data.isPublish && 'fas fa-check active-icon' || 'fas fa-times passive-icon'}></i> </span> }
+                            },
+                            {
+                                header: <span>#</span>,
+                                dynamicButton: (data) => { return <button onClick={() => {setSelectedCompanyTypeId(data.companyId);setSelectedCompanyTypeId(data.companyTypeId); setPropertyModal(true) }} type='button' className='btn btn-sm btn-outline-success'><i class="fa fa-trophy"></i> Özellikler </button> }
+                            },
+                            {
+                                header: <span>#</span>,
+                                dynamicButton: (data) => { return <button type='button' className='btn btn-sm btn-outline-info'><i className='fas fa-file-image'></i>  Resimler </button> }
+                            }
 
                         ]} Title={<span>Firma  Listesi</span>}
                             Description={"Firma kayıtlarında düzenleme ve ekleme işlemini burdan yapabilirsiniz"}
