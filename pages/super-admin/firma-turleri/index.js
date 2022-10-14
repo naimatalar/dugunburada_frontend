@@ -78,6 +78,7 @@ export default function Index() {
   }
 
     const editData = async (data) => {
+        setFile(null)
         setHiddenPassordField(true)
         var d = await GetWithToken("CompanyType/getById/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("", e.response.data); return false })
 
@@ -114,8 +115,8 @@ export default function Index() {
                         validate={values => {
                             const errors = {};
 
-                            if (!values.key) {
-                                errors.key = 'Bu alan zorunludur';
+                            if (!values.name) {
+                                errors.name = 'Bu alan zorunludur';
                             }
                             return errors;
                         }}
@@ -135,9 +136,9 @@ export default function Index() {
                                     <ErrorMessage name="id" component="div" className='text-danger' />
                                     <Field type="hidden" name="id" />
                                     <div className=' col-12  mb-3'>
-                                        <ErrorMessage name="key" component="div" className='text-danger danger-alert-form' />
+                                        <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
                                         <label className='input-label'>Firma Türü Adı</label>
-                                        <Field type="text" id="key" className="form-control" name="key" />
+                                        <Field type="text" id="name" className="form-control" name="name" />
                                     </div>
 
 
@@ -193,21 +194,14 @@ export default function Index() {
                     <div className='card'>
                         <DataTable Refresh={refreshDataTable} DataUrl={"CompanyType/GetCompanyType"} Headers={[
                             ["name", "Firma Türü Adı"],
-                            ["email", "E-Posta"],
-                            ["phone", "Telefon"],
-
-                            ["address", "Adres"],
-                            {
-                                header: <span>Detay</span>,
-                                dynamicButton: (data) => { return <a className='btn btn-sm btn-outline-info' title='Barkod Yazdır' href={"firma-tanimlari/detay/" + data.id}><i className='fas fa-search'></i> Detay</a> }
-                            }
-                        ]} Title={<span>Firma Listesi</span>}
+                            ["companyCount", "Firma Sayısı"],
+                        
+                        ]} Title={<span>Firma Türü Listesi</span>}
                             Description={"Firma Türü kayıtlarında düzenleme ve ekleme işlemini burdan yapabilirsiniz"}
                             HeaderButton={{
                                 text: "Firma Türü Ekle", action: () => {
                                     setModelOpen(!modalOpen)
                                     setInitialData({})
-
                                 }
                             }}
                             EditButton={editData}
