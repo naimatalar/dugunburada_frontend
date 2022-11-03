@@ -9,11 +9,11 @@ import PageLoading from '../../../layout/pageLoading';
 import Image from "next/image"
 import { Modal, ModalBody, ModalHeader, Tooltip } from 'reactstrap';
 import { fileUploadUrl, GetWithToken, PostWithToken, PostWithTokenFile } from '../../api/crud';
-
+const isBrowser = typeof window !== "undefined";
 
 export default function Index() {
     const [modalOpen, setModelOpen] = useState(false)
-    const [initialData, setInitialData] = useState({ id: null })
+    const [initialData, setInitialData] = useState({ id: null, keyList: [] })
     const [hiddenPassordField, setHiddenPassordField] = useState(false)
     const [refresh, setRefresh] = useState(null)
 
@@ -25,6 +25,8 @@ export default function Index() {
     const [selectedCompanyType, setSelectedCompanyType] = useState()
     const [selectedCompanyTypeText, setSelectedCompanyTypeText] = useState()
     const [companyTypeList, setCompanyTypeList] = useState([])
+    const [pListVal, setPlistVal] = useState()
+
 
     useEffect(() => {
 
@@ -33,6 +35,12 @@ export default function Index() {
     const start = async () => {
         var d = await GetWithToken("CompanyType/GetCompanyType").then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
 
+        if (d.data?.length == 0) {
+            alert("Öncelikle firma türü eklenmelidir")
+            if (isBrowser) {
+                window.location.replace("/super-admin/firma-turleri")
+            }
+        }
         setSelectedCompanyType(d.data[0].id)
         setSelectedCompanyTypeText(d.data[0].name)
         setCompanyTypeList(d.data)
@@ -106,7 +114,7 @@ export default function Index() {
                         initialValues={initialData}
                         validate={values => {
                             const errors = {};
-
+                           values.keyList=[]
                             if (!values.key) {
                                 errors.key = 'Bu alan zorunludur';
                             }
@@ -157,9 +165,42 @@ export default function Index() {
                                             <option value={4}>
                                                 Var/Yok
                                             </option>
+                                            <option value={5}>
+                                                Liste
+                                            </option>
+
                                         </select>
 
                                     </div>
+                                    {
+                                        values.companyPropertyValueType == 5 &&
+                                        <div className='mb-3 row col-12'>
+                                            <div className='col-12 col-md-6'>
+
+                                                <label className='input-label'>Değerler</label>
+                                                <input type="text" id="kList" onChange={(x)=>{setPlistVal(x.target.value)}} className="form-control" name="kList" />
+
+                                            </div>
+                                            <div className='col-12 col-md-6'>
+                                                <button className='btn btn-outline-success' onClick={(x) => { 
+                                                      debugger
+                                                      var sad=values
+                                                    var kl = sad?.keyList &&
+                                                    kl.push(pListVal);
+                                                    setFieldValue("keyList", kl)
+                                                }}>+ Ekle</button>
+                                            </div>
+                                        </div>
+                                    }
+
+
+                                    {
+                                        values?.keyList?.map((item, key) => {
+                                            debugger
+                                            return (<div>{item}</div>)
+                                        })
+                                    }
+
                                     <div className='col-12  mb-3'>
                                         <ErrorMessage name="isDefault" component="div" className='text-danger danger-alert-form' />
                                         <label className='mr-4'><Field type="checkbox" id="isDefault" name="isDefault" />Bütün Firmalar İçin </label>
@@ -200,10 +241,10 @@ export default function Index() {
 
 
                                 <div className='card-header bg-transparent header-elements-inline row'>
-                                    <div className='row' style={{width:"100%"}}>
+                                    <div className='row' style={{ width: "100%" }}>
                                         <h2><b>Firma Türü</b></h2>
-                                        <div className='row' style={{width:"100%"}}>
-                                            <select style={{width:"100%",padding:5}}  onChange={(x)=>{setSelectedCompanyType(x.target.value);setRefreshDatatable(new Date())}}>
+                                        <div className='row' style={{ width: "100%" }}>
+                                            <select style={{ width: "100%", padding: 5 }} onChange={(x) => { setSelectedCompanyType(x.target.value); setRefreshDatatable(new Date()) }}>
                                                 {companyTypeList.map((item, key) => {
                                                     return <option key={key} value={item.id}>
                                                         {item.name}

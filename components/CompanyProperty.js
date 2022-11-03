@@ -111,17 +111,14 @@ export default function CompanyProperty({ modalOpen, setModelOpen, companyProper
 
                                             <CurrencyInput suffix=' TL' style={{ marginTop: -8 }} className='form-control'></CurrencyInput>
                                         </div>
-                                        <div className='col-md-6 mt-2'>
+                                        <div className='col-md-12 row m-0 justify-content-end mt-2'>
                                             <button className='btn btn-sm btn-info'>+ Ekle</button>
                                         </div>
                                     </div>
                                 }
                                 {
-                                    property.map((item,key)=>{})
+                                    // property.map((item,key)=>{})
                                 }
-
-
-
 
 
                                 <div className='row col-12  mt-4 p-0'>
