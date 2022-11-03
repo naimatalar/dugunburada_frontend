@@ -112,7 +112,7 @@ export default function Index() {
                     <div className="d-flex justify-content-center mb-2">
                     </div>
                     <div className="d-flex ">
-                        <p>Firma Türü <b>Tanımlama</b> Formu</p>
+                        <p>FirmaÖzellik <b>Ekleme</b> Formu</p>
                     </div>
                     <button onClick={() => setModelOpen(!modalOpen)} type='button' className='modal-close-button btn btn-danger btn-sm p-1'><i className='fas fa-times'></i></button>
 
@@ -218,7 +218,7 @@ export default function Index() {
                             },
                             {
                                 header: <span>#</span>,
-                                dynamicButton: (data) => { return <button onClick={() => {setSelectedCompanyTypeId(data.companyId);setSelectedCompanyTypeId(data.companyTypeId); setPropertyModal(true) }} type='button' className='btn btn-sm btn-outline-success'><i class="fa fa-trophy"></i> Özellikler </button> }
+                                dynamicButton: (data) => { return <button onClick={() => {debugger;setSelectedComapnyId(data.companyId);setSelectedCompanyTypeId(data.companyTypeId); setPropertyModal(true) }} type='button' className='btn btn-sm btn-outline-success'><i class="fa fa-trophy"></i> Özellikler </button> }
                             },
                             {
                                 header: <span>#</span>,

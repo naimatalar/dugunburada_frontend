@@ -3104,3 +3104,29 @@ color: white;
     text-align: center;
     color: white;
     }
+    .p-list-item{
+        padding: 4px;
+    background: #e6ffe6;
+    border-radius: 5px;
+    border: 1px solid #71b900;
+    font-weight: bold;
+    position: relative;
+    }
+    .remove-lst-button{
+        background-color: rgb(253, 172, 172);
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 30px;
+        top:-2px;
+        right: -14px;
+        border:1px solid red;
+        cursor: pointer;
+
+    }
+    .remove-lst-button:hover{
+color: white;
+background-color: red;
+    }

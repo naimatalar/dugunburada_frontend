@@ -13,7 +13,7 @@ const isBrowser = typeof window !== "undefined";
 
 export default function Index() {
     const [modalOpen, setModelOpen] = useState(false)
-    const [initialData, setInitialData] = useState({ id: null, keyList: [] })
+    const [initialData, setInitialData] = useState({ id: null, valueList: [] })
     const [hiddenPassordField, setHiddenPassordField] = useState(false)
     const [refresh, setRefresh] = useState(null)
 
@@ -26,6 +26,7 @@ export default function Index() {
     const [selectedCompanyTypeText, setSelectedCompanyTypeText] = useState()
     const [companyTypeList, setCompanyTypeList] = useState([])
     const [pListVal, setPlistVal] = useState()
+    const [plist, setPlist] = useState([])
 
 
     useEffect(() => {
@@ -50,7 +51,7 @@ export default function Index() {
     const submit = async (val) => {
         var dataId = null;
         if (val.id == undefined) {
-            var d = await PostWithToken("CompanyProperty/Create", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("CompanyProperty/createList", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
             if (d.isError) {
                 alert(d.message)
             } else {
@@ -81,13 +82,19 @@ export default function Index() {
 
     }
 
+    const removePrList = async (data) => {
+       var ls=plist.filter(x=>{return x!=data})
+        setPlist(ls)
+        setRefreshDatatable(new Date())
 
+    }
     const editData = async (data) => {
-
+        setPlist([])
         var d = await GetWithToken("CompanyProperty/getById/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("", e.response.data); return false })
 
         setInitialData(d.data)
 
+        setPlist(d.data.valueList)
         setRefresh(new Date())
         setModelOpen(true)
     }
@@ -114,7 +121,7 @@ export default function Index() {
                         initialValues={initialData}
                         validate={values => {
                             const errors = {};
-                           values.keyList=[]
+                            values.valueList = []
                             if (!values.key) {
                                 errors.key = 'Bu alan zorunludur';
                             }
@@ -127,7 +134,7 @@ export default function Index() {
                         onSubmit={(values, { setSubmitting }) => {
                             values.companyPropertyKind = selectedkind
                             values.companyTypeId = selectedCompanyType
-
+                            values.valueList = plist.map((item, key) => { return item.item })
                             setTimeout(async () => {
                                 await submit(values)
                                 setSubmitting(false);
@@ -178,28 +185,30 @@ export default function Index() {
                                             <div className='col-12 col-md-6'>
 
                                                 <label className='input-label'>Değerler</label>
-                                                <input type="text" id="kList" onChange={(x)=>{setPlistVal(x.target.value)}} className="form-control" name="kList" />
+                                                <input type="text" id="kList" onChange={(x) => { setPlistVal(x.target.value) }} className="form-control" name="kList" />
 
                                             </div>
                                             <div className='col-12 col-md-6'>
-                                                <button className='btn btn-outline-success' onClick={(x) => { 
-                                                      debugger
-                                                      var sad=values
-                                                    var kl = sad?.keyList &&
-                                                    kl.push(pListVal);
-                                                    setFieldValue("keyList", kl)
+                                                <button type='button' className='btn btn-outline-success' onClick={(x) => {
+
+                                                    var sad = plist
+
+                                                    plist.push({ item: pListVal, id: "" });
+                                                    setFieldValue("valueList", plist)
                                                 }}>+ Ekle</button>
                                             </div>
                                         </div>
                                     }
 
+                                    <div className='col-12'>
+                                        {
+                                            plist?.map((item, key) => {
+                                                debugger
+                                                return (<div className='col-12 p-list-item mb-2' key={key}>{item.item} <span onClick={()=>{removePrList(item)}} className='remove-lst-button'>X</span></div>)
+                                            })
+                                        }
+                                    </div>
 
-                                    {
-                                        values?.keyList?.map((item, key) => {
-                                            debugger
-                                            return (<div>{item}</div>)
-                                        })
-                                    }
 
                                     <div className='col-12  mb-3'>
                                         <ErrorMessage name="isDefault" component="div" className='text-danger danger-alert-form' />
@@ -311,6 +320,7 @@ export default function Index() {
                                     HeaderButton={{
                                         text: "Yeni Ekle", action: () => {
                                             setModelOpen(!modalOpen)
+                                            setPlist([])
                                             setInitialData({})
                                         }
                                     }}
