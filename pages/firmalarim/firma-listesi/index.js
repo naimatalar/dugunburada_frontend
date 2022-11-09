@@ -49,7 +49,7 @@ export default function Index() {
                 dataId = d.data.id
             }
 
-        } else {
+        } else { 
             var d = await PostWithToken("Company/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
 
             if (d.isError) {
