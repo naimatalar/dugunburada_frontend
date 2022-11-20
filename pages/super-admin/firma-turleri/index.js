@@ -34,7 +34,7 @@ export default function Index() {
     const submit = async (val) => {
         var dataId = null;
         if (val.id == undefined) {
-            var d = await PostWithToken("CompanyType/Create", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("CompanyType/Create", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
             if (d.isError) {
                 alert(d.message)
             } else {
@@ -43,7 +43,7 @@ export default function Index() {
             }
 
         } else {
-            var d = await PostWithToken("CompanyType/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("CompanyType/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
             if (d.isError) {
                 alert(d.message)
@@ -52,9 +52,9 @@ export default function Index() {
             }
         }
         if (file) {
-            var d = await PostWithTokenFile("FileUpload/Upload", { name: "file", data: file }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithTokenFile("FileUpload/Upload", { name: "file", data: file }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
-            await PostWithToken("CompanyType/UploadFile", { fileName: d.data.fileName, id: dataId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            await PostWithToken("CompanyType/UploadFile", { fileName: d.data.fileName, id: dataId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
         }
 
@@ -62,7 +62,7 @@ export default function Index() {
     }
 
     const deleteData = async (data) => {
-        var d = await GetWithToken("CompanyType/delete/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        var d = await GetWithToken("CompanyType/delete/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
         if (d.isError) {
             alert(d.message)
         }
@@ -72,7 +72,7 @@ export default function Index() {
 
     const deleteFile = async (fileName,id) => {
         
-        await PostWithToken("CompanyType/FileDelete", { fileName: fileName, id: id }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        await PostWithToken("CompanyType/FileDelete", { fileName: fileName, id: id }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
     
   }

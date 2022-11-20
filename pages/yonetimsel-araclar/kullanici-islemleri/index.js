@@ -39,10 +39,10 @@ export default function Index() {
     const submit = async (val) => {
 
         if (val.values.id == undefined) {
-            await PostWithToken("UserManager/CreateUser", val.values).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            await PostWithToken("UserManager/CreateUser", val.values).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
         } else {
-            var d = await PostWithToken("UserManager/EditUser", val.values).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("UserManager/EditUser", val.values).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
             if (d.isError) {
                 alert(d.message)
             }
@@ -50,7 +50,7 @@ export default function Index() {
         setRefreshDatatable(new Date())
     }
     const deleteData = async (data) => {
-        var d = await GetWithToken("UserManager/delete/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        var d = await GetWithToken("UserManager/delete/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
         if (d.isError) {
             alert(d.message)
         }

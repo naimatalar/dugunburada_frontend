@@ -40,7 +40,7 @@ export default function Index() {
     const submit = async (val) => {
         var dataId = null;
         if (val.id == undefined) {
-            var d = await PostWithToken("Company/Create", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("Company/Create", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
             console.log(d)
             if (d.isError) {
                 alert(d.message)
@@ -50,7 +50,7 @@ export default function Index() {
             }
 
         } else { 
-            var d = await PostWithToken("Company/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("Company/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
             if (d.isError) {
                 alert(d.message)
@@ -59,9 +59,9 @@ export default function Index() {
             }
         }
         if (file) {
-            var d = await PostWithTokenFile("FileUpload/Upload", { name: "file", data: file }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithTokenFile("FileUpload/Upload", { name: "file", data: file }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
-            await PostWithToken("Company/UploadFile", { fileName: d.data.fileName, id: dataId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            await PostWithToken("Company/UploadFile", { fileName: d.data.fileName, id: dataId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
         }
 
@@ -69,7 +69,7 @@ export default function Index() {
     }
 
     const deleteData = async (data) => {
-        var d = await GetWithToken("Company/delete/" + data.companyId).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        var d = await GetWithToken("Company/delete/" + data.companyId).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
         if (d.isError) {
             alert(d.message)
         }
@@ -86,8 +86,9 @@ export default function Index() {
 
     const editData = async (data) => {
         setFile(null)
+        console.log(data)
         setHiddenPassordField(true)
-        var d = await GetWithToken("Company/getById/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("", e.response.data); return false })
+        var d = await GetWithToken("Company/getById/" + data.companyId).then(x => { return x.data }).catch((e) => { AlertFunction("", e.response.data); return false })
 
 
         setInitialData(d.data)
@@ -102,7 +103,6 @@ export default function Index() {
             loading && <PageLoading></PageLoading>
         }
 
-            {propertyModal && <CompanyProperty companyId={selectedComapnyId} modalOpen={propertyModal} companyPropertyTypeId={selectedCompanyPropertyTypeId} setModelOpen={setPropertyModal}></CompanyProperty>}
 
             <Modal isOpen={modalOpen}
                 size="sm"
@@ -150,7 +150,7 @@ export default function Index() {
                                     <div className=' col-12  mb-3'>
                                         <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
                                         <label className='input-label'>Firma Türü</label>
-                                        <select className='form-control' onChange={handleChange} onBlur={onblur} id="CompanyTypeId" name="CompanyTypeId">
+                                        <select className='form-control' value={values.companyTypeId} onChange={handleChange} onBlur={onblur} id="companyTypeId" name="companyTypeId">
                                             <option>Seçiniz</option>
                                             {companyTypeList.map((item, key) => {
                                                 return <option key={key} value={item.id}>{item.name}</option>
@@ -218,7 +218,7 @@ export default function Index() {
                             },
                             {
                                 header: <span>#</span>,
-                                dynamicButton: (data) => { return <button onClick={() => {debugger;setSelectedComapnyId(data.companyId);setSelectedCompanyTypeId(data.companyTypeId); setPropertyModal(true) }} type='button' className='btn btn-sm btn-outline-success'><i class="fa fa-trophy"></i> Özellikler </button> }
+                                dynamicButton: (data) => { return <a href={"firma-listesi/firma-ozellikleri/"+data.companyId}  className='btn btn-sm btn-outline-success'><i class="fa fa-trophy"></i> Özellikler </a> }
                             },
                             {
                                 header: <span>#</span>,
@@ -228,7 +228,7 @@ export default function Index() {
                         ]} Title={<span>Firma  Listesi</span>}
                             Description={"Firma kayıtlarında düzenleme ve ekleme işlemini burdan yapabilirsiniz"}
                             HeaderButton={{
-                                text: "Firma Türü Ekle", action: () => {
+                                text: "Firma  Ekle", action: () => {
                                     setModelOpen(!modalOpen)
                                     setInitialData({})
                                 }

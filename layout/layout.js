@@ -11,7 +11,7 @@ import { addOrUpdateStorage, getLaboratoryFromStorage, storageMercahtKey } from 
 import PageLoading from './pageLoading';
 
 
-function Layout({ children, permissionControl = true }) {
+function Layout({ children, permissionControl = true ,loadingContent=false }) {
     const [dropdownEnvelope, setDropdownEnvelope] = useState(false)
     const toggleEnvelope = () => setDropdownEnvelope(!dropdownEnvelope)
 
@@ -268,8 +268,8 @@ function Layout({ children, permissionControl = true }) {
 
                 <div className='content-wrapper'>
 
-
-                    {!permission && children}
+    {loadingContent&& <PageLoading></PageLoading>}
+                    {!permission &&!loadingContent&& children}
 
                     {permission && <div className='content'>
                         <div className='row mt-5'>

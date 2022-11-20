@@ -41,11 +41,11 @@ export default function Index() {
     const submit = async (val) => {
 
         if (val.values.id == undefined) {
-            var data = await PostWithToken("RoleManager/CreateRole", val.values).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor."); return false })
+            var data = await PostWithToken("RoleManager/CreateRole", val.values).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor."); return false })
 
 
         } else {
-            var d = await PostWithToken("RoleManager/EditRole", val.values).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("RoleManager/EditRole", val.values).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
             if (d.isError) {
                 alert(d.message)
             }
@@ -53,7 +53,7 @@ export default function Index() {
         setRefreshDatatable(new Date())
     }
     const deleteData = async (data) => {
-        var d = await GetWithToken("RoleManager/delete/" + data.id).then(x => { return x.data }).catch((e) => {console.log(e); AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        var d = await GetWithToken("RoleManager/delete/" + data.id).then(x => { return x.data }).catch((e) => {console.log(e); AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
         if (d.isError) {
             alert(d.message)
         }
@@ -65,7 +65,7 @@ export default function Index() {
 
     const editData = async (data) => {
         setHiddenPassordField(true)
-        var d = await GetWithToken("RoleManager/GetById/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        var d = await GetWithToken("RoleManager/GetById/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
         setInitialData(d.data)
         setModelOpen(true)
     }

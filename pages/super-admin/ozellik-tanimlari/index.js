@@ -34,7 +34,7 @@ export default function Index() {
         start();
     }, [])
     const start = async () => {
-        var d = await GetWithToken("CompanyType/GetCompanyType").then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        var d = await GetWithToken("CompanyType/GetCompanyType").then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
         if (d.data?.length == 0) {
             alert("Öncelikle firma türü eklenmelidir")
@@ -51,7 +51,7 @@ export default function Index() {
     const submit = async (val) => {
         var dataId = null;
         if (val.id == undefined) {
-            var d = await PostWithToken("CompanyProperty/createList", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("CompanyProperty/createList", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
             if (d.isError) {
                 alert(d.message)
             } else {
@@ -60,7 +60,7 @@ export default function Index() {
             }
 
         } else {
-            var d = await PostWithToken("CompanyProperty/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("CompanyProperty/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
             if (d.isError) {
                 alert(d.message)
@@ -74,7 +74,7 @@ export default function Index() {
     }
 
     const deleteData = async (data) => {
-        var d = await GetWithToken("CompanyProperty/delete/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        var d = await GetWithToken("CompanyProperty/delete/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
         if (d.isError) {
             alert(d.message)
         }
