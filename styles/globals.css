@@ -15,14 +15,31 @@ a {
   box-sizing: border-box;
 }
 
-.firm-detail-box-field{
+.firm-detail-box-field {
   font-size: 14px;
   border-bottom: 2px dashed #32414873;
   padding-bottom: 6px;
   padding-top: 6px;
   background: #26a69a2b;
 }
-.firm-detail-box{
+
+.firm-detail-box {
   box-shadow: 1px 17px 26px -9px black;
-    padding: 18px;
+  padding: 18px;
+}
+
+.nav-item a {
+  cursor: pointer;
+}
+
+.property-tab-ad .nav-link {
+  padding: 0.40rem 0.70rem;
+
+  color: #000;
+  background-color: #e6e6e6;
+  border-color: #ddd #ddd #fff;
+}
+.property-tab-ad .nav-item .active {
+  background: #263238 !important;
+  color: white !important;
 }
