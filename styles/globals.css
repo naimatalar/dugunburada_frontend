@@ -43,3 +43,13 @@ a {
   background: #263238 !important;
   color: white !important;
 }
+.input-value-label{
+  position: absolute;
+    display: block;
+    width: 100%;
+    background: white;
+    left: 0;
+}
+.hide-value-key{
+  display: none !important;
+}

@@ -7,6 +7,7 @@ import AlertFunction from '../../../../components/alertfunction';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 const isBrowser = typeof window !== "undefined";
 import classnames from 'classnames';
+import CurrencyInput from 'react-currency-input-field';
 function Index(props) {
 
 
@@ -14,6 +15,8 @@ function Index(props) {
     const [loadingContent, setLoadingContent] = useState(true);
     const [company, setCompany] = useState({});
     const [activeTab, setActiveTab] = useState("1");
+    const [properties, setProperties] = useState([]);
+    const [hideLabel, setHideLabel] = useState();
 
 
     useEffect(() => {
@@ -27,12 +30,22 @@ function Index(props) {
             var d = await GetWithToken("Company/GetFullDataCompanyById/" + id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
             setLoadingContent(false);
             setCompany(d.data)
-            console.log(d.data)
+
+            getProperty("1")
         }
 
     }
     const changeTab = async (tabId) => {
         setActiveTab(tabId)
+        getProperty(tabId)
+    }
+    const getProperty = async (property) => {
+        if (isBrowser) {
+            const hrf = window.location.href.split("/")
+            const id = hrf[hrf.length - 1]
+            var d = await GetWithToken("Company/GetCompanyPropertyByCompanyAndPropertyId/" + id + "/" + property).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+            setProperties(d.data)
+        }
 
     }
 
@@ -73,37 +86,37 @@ function Index(props) {
 
                             <Nav tabs>
                                 <NavItem>
-                                    <NavLink onClick={() => changeTab("1")} className={classnames({ active: activeTab=="1" })}>
+                                    <NavLink onClick={() => changeTab("1")} className={classnames({ active: activeTab == "1" })}>
                                         Fiyatlandırma
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink onClick={() => changeTab("2")} className={classnames({ active: activeTab=="2"  })}>
+                                    <NavLink onClick={() => changeTab("2")} className={classnames({ active: activeTab == "2" })}>
                                         Teknik ve Lokasyon Özellikleri
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink onClick={() => changeTab("3")} className={classnames({ active: activeTab=="3"  })}>
+                                    <NavLink onClick={() => changeTab("3")} className={classnames({ active: activeTab == "3" })}>
                                         Hizmet ve Organizasyon
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink onClick={() => changeTab("4")} className={classnames({ active: activeTab=="4"  })}>
+                                    <NavLink onClick={() => changeTab("4")} className={classnames({ active: activeTab == "4" })}>
                                         Kapasite Bilgileri
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink onClick={() => changeTab("5")} className={classnames({ active: activeTab=="5"  })}>
+                                    <NavLink onClick={() => changeTab("5")} className={classnames({ active: activeTab == "5" })}>
                                         Genel Özellikler
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink onClick={() => changeTab("6")} className={classnames({ active: activeTab=="6"  })}>
+                                    <NavLink onClick={() => changeTab("6")} className={classnames({ active: activeTab == "6" })}>
                                         Sık Sorulan Sorular
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink onClick={() => changeTab("7")} className={classnames({ active: activeTab=="7"  })}>
+                                    <NavLink onClick={() => changeTab("7")} className={classnames({ active: activeTab == "7" })}>
                                         Hakkımızda
                                     </NavLink>
                                 </NavItem>
@@ -111,7 +124,30 @@ function Index(props) {
                             <TabContent activeTab={activeTab}>
                                 <TabPane tabId="1">
                                     <div style={{ padding: 20 }}>
-                                        Fiyatlandırma
+                                        <div className='row'>
+
+
+                                            {properties.map((item, key) => {
+
+                                                return (
+                                                    <div className='mt-2 mb-2 col-12 col-md-6 row'>
+                                                        <div key={key} className="col-12 col-md-4">
+                                                            <label className='mt-1'> {item.key}</label>
+                                                        </div>
+                                                        <div key={key} className="col-12 col-md-5">
+                                                            {item.companyPropertyValueType == 3 &&
+                                                                <div style={{ position: "relative" }}>
+                                                                    <input type='text' onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} value={item.value}></input>
+                                                                    <CurrencyInput id={item.id} placeholder='Fiyat Giriniz' suffix=' TL' className='form-control'></CurrencyInput>
+
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+
+                                                )
+                                            })}
+                                        </div>
                                     </div>
                                 </TabPane>
                                 <TabPane tabId="2">
@@ -121,7 +157,26 @@ function Index(props) {
                                 </TabPane>
                                 <TabPane tabId="3">
                                     <div style={{ padding: 20 }}>
-                                        Hizmet ve Organizasyon
+                                        {properties.map((item, key) => {
+
+                                            return (
+                                                <div className='mt-2 mb-2 col-12 col-md-6 row'>
+                                                    <div key={key} className="col-12 col-md-4">
+                                                        <label className='mt-1'> {item.key}</label>
+                                                    </div>
+                                                    <div key={key} className="col-12 col-md-5">
+                                                        {item.companyPropertyValueType == 1 &&
+                                                            <div style={{ position: "relative" }}>
+                                                                <input type='text' onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} value={item.value}></input>
+                                                                <textarea id={item.id} placeholder={item.key+' Giriniz'}  className='form-control'></textarea>
+
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                            )
+                                        })}
                                     </div>
                                 </TabPane>
                                 <TabPane tabId="4">
