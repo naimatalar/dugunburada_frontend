@@ -172,9 +172,9 @@ export default function Index() {
                                             <option value={4}>
                                                 Var/Yok
                                             </option>
-                                            <option value={5}>
+                                            {/* <option value={5}>
                                                 Liste
-                                            </option>
+                                            </option> */}
 
                                         </select>
 

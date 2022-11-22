@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../../../../layout/layout';
 import PageHeader from '../../../../layout/pageheader';
 import { useRouter } from 'next/router'
-import { fileUploadUrl, GetWithToken } from '../../../api/crud';
+import { fileUploadUrl, GetWithToken, PostNoneToken, PostWithToken } from '../../../api/crud';
 import AlertFunction from '../../../../components/alertfunction';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 const isBrowser = typeof window !== "undefined";
@@ -45,10 +45,16 @@ function Index(props) {
             const id = hrf[hrf.length - 1]
             var d = await GetWithToken("Company/GetCompanyPropertyByCompanyAndPropertyId/" + id + "/" + property).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
             setProperties(d.data)
+            console.log(d.data)
+
         }
 
     }
+    const setProperty = async (value, propertyId) => {
 
+        var d = await PostWithToken("Company/SetProperty", { value: value, properyId: propertyId, companyId: company.id }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+        getProperty(activeTab)
+    }
 
     return (
         <Layout loadingContent={loadingContent} permissionControl={false}>
@@ -127,17 +133,15 @@ function Index(props) {
                                         <div className='row'>
 
 
-                                            {properties.map((item, key) => {
+                                            {/* {properties.map((item, key) => {
 
                                                 return (
                                                     <div className='mt-2 mb-2 col-12 col-md-6 row'>
-                                                        <div key={key} className="col-12 col-md-4">
+                                                        <div key={key} className="col-12 col-md-6">
                                                             <label className='mt-1'> {item.key}</label>
-                                                        </div>
-                                                        <div key={key} className="col-12 col-md-5">
                                                             {item.companyPropertyValueType == 3 &&
                                                                 <div style={{ position: "relative" }}>
-                                                                    <input type='text' onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} value={item.value}></input>
+                                                                    <input type='text' onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} value={item.companyPropertyValues?.value}></input>
                                                                     <CurrencyInput id={item.id} placeholder='Fiyat Giriniz' suffix=' TL' className='form-control'></CurrencyInput>
 
                                                                 </div>
@@ -146,7 +150,7 @@ function Index(props) {
                                                     </div>
 
                                                 )
-                                            })}
+                                            })} */}
                                         </div>
                                     </div>
                                 </TabPane>
@@ -156,24 +160,64 @@ function Index(props) {
                                     </div>
                                 </TabPane>
                                 <TabPane tabId="3">
-                                    <div style={{ padding: 20 }}>
+                                    <div style={{ padding: 20 }} className="row">
                                         {properties.map((item, key) => {
 
                                             return (
-                                                <div className='mt-2 mb-2 col-12 col-md-6 row'>
-                                                    <div key={key} className="col-12 col-md-4">
-                                                        <label className='mt-1'> {item.key}</label>
-                                                    </div>
-                                                    <div key={key} className="col-12 col-md-5">
-                                                        {item.companyPropertyValueType == 1 &&
+                                                <>
+
+                                                    {item.companyPropertyValueType == 1 &&
+                                                        <div className='col-12'>
+                                                            <label className='mt-1'> {item.key}</label>
                                                             <div style={{ position: "relative" }}>
-                                                                <input type='text' onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} value={item.value}></input>
-                                                                <textarea id={item.id} placeholder={item.key+' Giriniz'}  className='form-control'></textarea>
+                                                                <textarea onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} value={item.companyPropertyValues?.value}></textarea>
+                                                                <textarea onChange={(val) => { setProperty(val.target.value, item.id) }} id={item.id} placeholder={item.key + ' Giriniz'} className='form-control'></textarea>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    {item.companyPropertyValueType == 2 &&
+                                                        <div className='col-12 col-md-6'>
+                                                            <label className='mt-1'> {item.key}</label>
+                                                            <div style={{ position: "relative" }}>
+                                                                <input type={"number"} onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} value={item.companyPropertyValues?.value}></input>
+                                                                <input type={"number"} onChange={(val) => { setProperty(val.target.value, item.id) }} id={item.id} placeholder={item.key + ' Giriniz'} className='form-control'></input>
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                    {item.companyPropertyValueType == 5 &&
+                                                        <div className='col-12'>
+                                                            <label className='mt-1'> {item.key}</label>
+                                                            <div style={{ position: "relative" }}>
+                                                                <textarea onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} value={item.companyPropertyValues?.value}></textarea>
+                                                                <textarea onChange={(val) => { setProperty(val.target.value, item.id) }} id={item.id} placeholder={item.key + ' Giriniz'} className='form-control'></textarea>
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                    {item.companyPropertyValueType == 3 &&
+
+                                                        <div className='col-12 col-md-6'>
+                                                            <label className='mt-1'> {item.key}</label>
+                                                            <div style={{ position: "relative" }}>
+                                                                <input type='text' onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} value={item.companyPropertyValues?.value}></input>
+                                                                <CurrencyInput onChange={(val) => { setProperty(val.target.value, item.id) }} id={item.id} placeholder='Fiyat Giriniz' suffix=' TL' className='form-control'></CurrencyInput>
 
                                                             </div>
-                                                        }
-                                                    </div>
-                                                </div>
+                                                        </div>
+
+                                                    }
+                                                    {item.companyPropertyValueType == 4 &&
+                                                        <div className='col-12 col-md-6'>
+                                                            <label className='mt-1'> {item.key}</label>
+                                                            <div style={{ position: "relative" }}>
+                                                                {/* <input type={"checkbox"} readOnly="readonly" onClick={() => { setHideLabel(item.id); document.getElementById(item.id).focus(); }} className={"form-control input-value-label " + (hideLabel == item.id && "hide-value-key")} checked={item.value}></input> */}
+                                                                <input type={"checkbox"} onChange={(val) => { setProperty(val.target.checked, item.id) }} checked={item.companyPropertyValues?.value == "True"} id={item.id} placeholder={item.key + ' Giriniz'} className='form-control'></input>
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                </>
 
                                             )
                                         })}
@@ -181,7 +225,7 @@ function Index(props) {
                                 </TabPane>
                                 <TabPane tabId="4">
                                     <div style={{ padding: 20 }}>
-                                        Kapasite Bilgileri
+                                     
                                     </div>
                                 </TabPane>
                                 <TabPane tabId="5">
