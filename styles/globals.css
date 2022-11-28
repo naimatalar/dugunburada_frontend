@@ -53,3 +53,20 @@ a {
 .hide-value-key{
   display: none !important;
 }
+.label-title-check{
+  font-weight: bold;
+    font-size: 17px;
+    text-decoration: underline;
+    margin-bottom: 15px;
+}
+.labelGroup{
+  border: 1px solid #727272;
+  background: #ebe9fc;
+}
+.switch-label{
+border: 1px solid #727272;
+    background: #ebe9fc;
+}
+.cl-both{
+  clear: both;
+}
