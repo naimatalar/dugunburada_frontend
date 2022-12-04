@@ -56,17 +56,29 @@ a {
 .label-title-check{
   font-weight: bold;
     font-size: 17px;
-    text-decoration: underline;
+    
     margin-bottom: 15px;
+    padding: 10px 1px 10px 5px !important;
 }
 .labelGroup{
   border: 1px solid #727272;
-  background: #ebe9fc;
+  
 }
 .switch-label{
-border: 1px solid #727272;
-    background: #ebe9fc;
+
+    margin-bottom: 6px;
+    margin-left: 4px;
+    font-weight: bold !important;
 }
 .cl-both{
   clear: both;
+}
+
+.faq-ansver-textarea{
+  background: #e5f7ff !important;
+  border: 1px solid #5284e2 !important;
+}
+.faq-question-textarea{
+  background: #e5ffeb !important;
+  border: 1px solid #047009 !important;
 }

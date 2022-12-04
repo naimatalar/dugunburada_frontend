@@ -11,7 +11,7 @@ import { addOrUpdateStorage, getLaboratoryFromStorage, storageMercahtKey } from 
 import PageLoading from './pageLoading';
 
 
-function Layout({ children, permissionControl = true ,loadingContent=false }) {
+function Layout({ children, permissionControl = true ,loadingContent=false,pageName }) {
     const [dropdownEnvelope, setDropdownEnvelope] = useState(false)
     const toggleEnvelope = () => setDropdownEnvelope(!dropdownEnvelope)
 
@@ -40,7 +40,7 @@ function Layout({ children, permissionControl = true ,loadingContent=false }) {
         if (permissionControl == false) {
             setPermission(false)
         } else {
-            var permission = await PermissionCheck().then(x => { return x })
+            var permission = await PermissionCheck(pageName).then(x => { return x })
             setPermission(permission)
         }
         var data = await GetWithToken("Layout/GetLayoutData").then(x => { return x.data })

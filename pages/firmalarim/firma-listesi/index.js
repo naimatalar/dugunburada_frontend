@@ -222,7 +222,7 @@ export default function Index() {
                             },
                             {
                                 header: <span>#</span>,
-                                dynamicButton: (data) => { return <button type='button' className='btn btn-sm btn-outline-info'><i className='fas fa-file-image'></i>  Resimler </button> }
+                                dynamicButton: (data) => { return <a href={"firma-listesi/resimler/"+data.companyId}   className='btn btn-sm btn-outline-info'> <i className='fas fa-file-image'></i>  Resimler </a> }
                             }
 
                         ]} Title={<span>Firma  Listesi</span>}
