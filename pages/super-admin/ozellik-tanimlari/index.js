@@ -203,7 +203,7 @@ export default function Index() {
                                     <div className='col-12'>
                                         {
                                             plist?.map((item, key) => {
-                                                debugger
+                                               
                                                 return (<div className='col-12 p-list-item mb-2' key={key}>{item.item} <span onClick={()=>{removePrList(item)}} className='remove-lst-button'>X</span></div>)
                                             })
                                         }

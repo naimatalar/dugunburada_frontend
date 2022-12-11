@@ -1,32 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../../../layout/layout';
 import PageHeader from '../../../../layout/pageheader';
-import { useRouter } from 'next/router'
-import { fileUploadUrl, GetWithToken, PostNoneToken, PostWithToken } from '../../../api/crud';
+import { fileUploadUrl, GetWithToken, imageUploadUrl, PostNoneToken, PostWithToken, PostWithTokenFile } from '../../../api/crud';
 import AlertFunction from '../../../../components/alertfunction';
-import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
-const isBrowser = typeof window !== "undefined";
-import classnames from 'classnames';
-import CompanyProperty from '../../../../components/CompanyProperty';
-// import CustomSunEditor from '../../../../components/CustomSunEditor';
-import dynamic from 'next/dynamic';
+import DeleteFunction from '../../../../components/deletefunction';
 
-import 'suneditor/dist/css/suneditor.min.css';
-import FaqCompnent from '../../../../components/FaqCompnent';
-import ContactUs from '../../../../components/ContactUs';
-const AboutUs = dynamic(() => import('../../../../components/AboutUs'), {
-    ssr: false,
-});
+const isBrowser = typeof window !== "undefined";
+
+
 
 function Index(props) {
 
 
 
     const [loadingContent, setLoadingContent] = useState(true);
-    const [company, setCompany] = useState({});
-    const [activeTab, setActiveTab] = useState("1");
-    const [properties, setProperties] = useState([]);
-    const [hideLabel, setHideLabel] = useState();
+    const [companyImage, setCompanyImage] = useState([]);
+    const [companyId, setCompanyId] = useState();
+
 
 
     useEffect(() => {
@@ -36,47 +26,45 @@ function Index(props) {
         if (isBrowser) {
             const hrf = window.location.href.split("/")
             const id = hrf[hrf.length - 1]
-
-            var d = await GetWithToken("Company/GetFullDataCompanyById/" + id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+            setCompanyId(id);
+            var d = await GetWithToken("Company/GetImages/" + id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
             setLoadingContent(false);
-            setCompany(d.data)
-
-            getProperty("1")
+            setCompanyImage(d.data)
         }
 
     }
-    const changeTab = async (tabId) => {
-        setActiveTab(tabId)
-        getProperty(tabId)
-    }
-    const getProperty = async (property) => {
-        if (isBrowser) {
-            const hrf = window.location.href.split("/")
-            const id = hrf[hrf.length - 1]
-            var d = await GetWithToken("Company/GetCompanyPropertyByCompanyAndPropertyId/" + id + "/" + property).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
-            setProperties(d.data)
-            console.log(d.data)
+    const uploadFile = async (data) => {
+       if(companyImage.length/3==10){
+        AlertFunction("Yükleme Yapılmadı", "En Fazla 10 Adet Resim Yüklenebilir");
+        return false
+       }
 
+        if (data) {
+            var d = await PostWithTokenFile("FileUpload/ImageUpload", { name: "file", data: data }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+
+            await PostWithToken("Company/uploadImage", { fileName: d.data.file.name, extension: d.data.file.extension, id: companyId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+            start()
         }
 
+
     }
-    const setProperty = async (value, propertyId) => {
+    const deleteImage = async (data) => {
+
+        if (data) {
+
+            await PostWithToken("Company/RemoveImage", { fileName: data, id: companyId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu Bu işlem için yetkiniz bulunmuyor"); return false })
 
 
-        var d = await PostWithToken("Company/SetProperty", { value: value, properyId: propertyId, companyId: company.id }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
-        getProperty(activeTab)
+            start()
+        }
     }
-    const setListProperty = async (value, ItemId) => {
 
-        var d = await PostWithToken("Company/AddCompanyListProperty", { isActive: value, companyId: company.id, itemId: ItemId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
-        getProperty(activeTab)
-    }
     return (
         <Layout loadingContent={loadingContent} pageName="firma-listesi">
             <PageHeader title="Firmalarım" map={[
                 { url: "", name: "Firmalarım" },
                 { url: "/firmalarim/firma-listesi/", name: "Firma Listesi" },
-                { url: "", name: "Firma Özellikleri" }
+                { url: "", name: "Resimler" }
             ]}>
 
             </PageHeader>
@@ -84,99 +72,31 @@ function Index(props) {
                 <div className='card pb-5'>
                     <div className='row mt-3'>
                         <div className='col-12 row justify-content-center align-items-center'>
-                            <img src={fileUploadUrl + company.logoUrl} style={{ width: 150 }} />
-                            <div className='ml-3'><b style={{ fontSize: 20 }}>{company.name}</b> <span style={{ fontSize: 17 }}>({company.companyType})</span> {company.isPublis && <b style={{ color: "green" }}>Yayında</b> || <b style={{ color: "red" }}>Yayında Değil</b>} </div>
+                            {/* <img src={fileUploadUrl + company.logoUrl} style={{ width: 150 }} /> */}
                         </div>
                     </div>
                     <div className='row mt-4 property-tab-ad'>
-                        <div className='col-12'>
-
-                            <Nav tabs>
-                                <NavItem>
-                                    <NavLink onClick={() => changeTab("1")} className={classnames({ active: activeTab == "1" })}>
-                                        Fiyatlandırma
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink onClick={() => changeTab("2")} className={classnames({ active: activeTab == "2" })}>
-                                        Teknik ve Lokasyon Özellikleri
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink onClick={() => changeTab("3")} className={classnames({ active: activeTab == "3" })}>
-                                        Hizmet ve Organizasyon
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink onClick={() => changeTab("4")} className={classnames({ active: activeTab == "4" })}>
-                                        Kapasite Bilgileri
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink onClick={() => changeTab("5")} className={classnames({ active: activeTab == "5" })}>
-                                        Genel Özellikler
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink onClick={() => changeTab("6")} className={classnames({ active: activeTab == "6" })}>
-                                        Sık Sorulan Sorular
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink onClick={() => changeTab("7")} className={classnames({ active: activeTab == "7" })}>
-                                        Hakkımızda
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink onClick={() => changeTab("8")} className={classnames({ active: activeTab == "8" })}>
-                                        İletişim
-                                    </NavLink>
-                                </NavItem>
-
-                            </Nav>
-                            <TabContent activeTab={activeTab}>
-                                <TabPane tabId="1">
-                                    {activeTab == "1" &&
-                                        <CompanyProperty setListProperty={setListProperty} hideLabel={hideLabel} setHideLabel={setHideLabel} setProperty={setProperty} properties={properties}></CompanyProperty>
-                                    }
-                                </TabPane>
-                                <TabPane tabId="2">
-                                    {activeTab == "2" && <CompanyProperty setListProperty={setListProperty} hideLabel={hideLabel} setHideLabel={setHideLabel} setProperty={setProperty} properties={properties}></CompanyProperty>
-                                    }
-                                </TabPane>
-                                <TabPane tabId="3">
-                                    {activeTab == "3" && <CompanyProperty setListProperty={setListProperty} hideLabel={hideLabel} setHideLabel={setHideLabel} setProperty={setProperty} properties={properties}></CompanyProperty>
-                                    }
-
-                                </TabPane>
-                                <TabPane tabId="4">
-                                    {activeTab == "4" && <CompanyProperty setListProperty={setListProperty} hideLabel={hideLabel} setHideLabel={setHideLabel} setProperty={setProperty} properties={properties}></CompanyProperty>
-                                    }
-
-                                </TabPane>
-                                <TabPane tabId="5">
-                                    {activeTab == "5" && <CompanyProperty setListProperty={setListProperty} hideLabel={hideLabel} setHideLabel={setHideLabel} setProperty={setProperty} properties={properties}></CompanyProperty>
-                                    }
-
-                                </TabPane>
-                                <TabPane tabId="6">
-                                    {activeTab == "6" &&
-                                        <FaqCompnent companyId={company.id}></FaqCompnent>
-                                    }
-                                </TabPane>
-                                <TabPane tabId="7">
-                                    {activeTab == "7" &&
-                                        <AboutUs companyId={company.id}></AboutUs>}
+                        <div className='col-12 row'>
+                            {companyImage.map((item, key) => {
 
 
-                                </TabPane>
-                                <TabPane tabId="8">
-                                    {activeTab == "8" &&
-                                        <ContactUs companyId={company.id}></ContactUs>}
+                                if (item.imageUrl?.includes("_x2")) {
+                                    return <div key={key} className="col-12 col-md-2 image-content">
+
+                                        <button className='delete-image-button' onClick={() => DeleteFunction("Uyarı", "Kayt Silinecek Onaylıyor Musunuz?", () => deleteImage(item.imageUrl.replace("_x2", "")))}><i className='fa fa-trash'></i></button>
+                                        <img src={imageUploadUrl + item.imageUrl} style={{ width: "100%" }} />
+
+                                    </div>
+                                }
 
 
-                                </TabPane>
-                            </TabContent>
+                            })}
+                            <div className="col-12 col-md-3">
+
+                                <button onClick={() => document.getElementById("file").click()}>Ekle</button>
+                                <input type={"file"} onChange={(x) => { uploadFile(x.target.files[0]) }} name="file" style={{ width: 1, height: 1, opacity: 0, position: "absolute", zIndex: -9999 }} id="file"></input>
+                            </div>
+
                         </div>
 
                     </div>

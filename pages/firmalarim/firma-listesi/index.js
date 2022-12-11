@@ -79,7 +79,7 @@ export default function Index() {
 
     const deleteFile = async (fileName, id) => {
 
-        await PostWithToken("Company/FileDelete", { fileName: fileName, id: id }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlmel için yetkiniz bulunmuyor"); return false })
+        await PostWithToken("Company/FileDelete", { fileName: fileName, id: id }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu Bu işlem için yetkiniz bulunmuyor"); return false })
 
 
     }

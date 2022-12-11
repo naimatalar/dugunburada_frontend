@@ -82,3 +82,19 @@ a {
   background: #e5ffeb !important;
   border: 1px solid #047009 !important;
 }
+.delete-image-button{
+  color: red;
+  border: 1px solid red;
+  background: #fcfcfc;
+  position: absolute;
+  right: 16px;
+  top: 10px;
+  width: 51px;
+  height: 29px;
+  border-radius: 8px;
+  display: none;
+}
+.image-content:hover .delete-image-button{
+  display: block;
+  cursor: pointer;
+}

@@ -51,7 +51,7 @@ function SetOrRemoveDeviceResultValueType({ device }) {
                             return errors;
                         }}
                         onSubmit={(values, { setSubmitting }) => {
-                            debugger
+                           
                             values.deviceId = device.id
                             setTimeout(async () => {
                                 await submit(values)

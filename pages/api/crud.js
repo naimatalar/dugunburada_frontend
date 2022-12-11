@@ -9,7 +9,7 @@ export const antegraSystem = "http://localhost:2354/api/";
 
 const masterUrl = apiConstant + "/api/";
 export const fileUploadUrl = apiConstant + "/root/Upload/";
-
+export const imageUploadUrl = apiConstant + "/root/UploadedImages/";
 export const GetWithToken = async (url) => {
     const headers =
     {

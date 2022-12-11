@@ -320,7 +320,7 @@ export const Modal = (props) => {
 
                                                     {
                                                         item.data.map((item2, key2) => {
-                                                            debugger
+                                                           
                                                             if (formik.values[item.props.name].filter(x => { return x == item2.id }).length > 0) {
                                                                 return false
                                                             }
