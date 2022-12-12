@@ -113,9 +113,9 @@ function Layout({ children, permissionControl = true ,loadingContent=false,pageN
 
             <div className="navbar navbar-expand-md navbar-dark">
                 <div className="navbar-brand">
-                    <a href="index.html" className="d-inline-block">
+                    <a href="index.html" style={{width:"80%"}} className="d-inline-block">
 
-                        <Image width={150} objectFit='contain' layout='fixed' src={require("../layout/global_assets/images/logo_light.png")} ></Image>
+                        <Image  objectFit='contain' layout='fixed' src={require("../layout/global_assets/images/logo_light.png")} ></Image>
                     </a>
                 </div>
 
