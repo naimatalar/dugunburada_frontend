@@ -6,10 +6,12 @@ import DataTable from '../../../components/datatable';
 import Layout from '../../../layout/layout';
 import PageHeader from '../../../layout/pageheader';
 import PageLoading from '../../../layout/pageLoading';
+import Select from 'react-select'
 import Image from "next/image"
 import { Modal, ModalBody, ModalHeader, Tooltip } from 'reactstrap';
 import { fileUploadUrl, GetWithToken, PostWithToken, PostWithTokenFile } from '../../api/crud';
 import CompanyProperty from '../../../components/CompanyProperty';
+import { il_ilce } from '../../../components/ililce';
 
 
 export default function Index() {
@@ -24,9 +26,11 @@ export default function Index() {
     const [file, setFile] = useState(null)
     const [companyTypeList, setCompanyTypeList] = useState([])
     const [selectedComapnyId, setSelectedComapnyId] = useState()
-
     const [selectedCompanyPropertyTypeId, setSelectedCompanyTypeId] = useState()
-
+    const [ilceler, setIlceler] = useState([])
+    const [defaultIl, setDefaulId] = useState();
+    const [defaultIcle, setDefaultIcle] = useState();
+    const [Il] = useState(il_ilce.map((item, key) => { return { value: item.plaka, label: item.il } }));
     useEffect(() => {
 
         start();
@@ -36,12 +40,12 @@ export default function Index() {
         setCompanyTypeList(d.data)
         setLoading(false)
     }
-
+    
     const submit = async (val) => {
         var dataId = null;
         if (val.id == undefined) {
             var d = await PostWithToken("Company/Create", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
-            console.log(d)
+
             if (d.isError) {
                 alert(d.message)
             } else {
@@ -49,7 +53,7 @@ export default function Index() {
                 dataId = d.data.id
             }
 
-        } else { 
+        } else {
             var d = await PostWithToken("Company/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
             if (d.isError) {
@@ -83,16 +87,24 @@ export default function Index() {
 
 
     }
-
+    const ilceFill = async (data) => {
+        var ilce = il_ilce.find(x => { return x.plaka == data })?.ilceleri.map((item, key) => { return { value: item, label: item } })
+        setIlceler(ilce)
+    }
     const editData = async (data) => {
         setFile(null)
-        console.log(data)
+        
         setHiddenPassordField(true)
         var d = await GetWithToken("Company/getById/" + data.companyId).then(x => { return x.data }).catch((e) => { AlertFunction("", e.response.data); return false })
 
 
         setInitialData(d.data)
-
+       
+              ilceFill(d.data.ilPlaka);
+        setDefaulId(d.data.ilPlaka)
+        setDefaultIcle(d.data.ilce)
+     
+      
 
         setRefresh(new Date())
         setModelOpen(true)
@@ -147,6 +159,24 @@ export default function Index() {
                                         <label className='input-label'>Firma Adı</label>
                                         <Field type="text" id="name" className="form-control" name="name" />
                                     </div>
+
+                                    <div className=' col-12  mb-3'>
+                                        <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
+                                        <label className='input-label'>İl Seçiniz</label>
+                                        {Il.length > 0 &&
+                                            <Select options={Il} defaultValue={Il.find(x=>{return x.value==defaultIl})} onChange={(x) => { setFieldValue("ilPlaka", x.value); handleChange("ilPlaka"); ilceFill(x.value) }} name="ilPlaka" ></Select>
+                                        }
+
+                                    </div>
+                                    {values.ilPlaka &&
+
+                                        <div className=' col-12  mb-3'>
+                                            <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
+                                            <label className='input-label'>İl Seçiniz</label>
+                                            <Select options={ilceler} defaultValue={ilceler.find(x=>{return x.value==defaultIcle})} onChange={(x) => { setFieldValue("ilce", x.value); handleChange("ilce") }} name="ilce" ></Select>
+                                        </div>
+                                    }
+
                                     <div className=' col-12  mb-3'>
                                         <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
                                         <label className='input-label'>Firma Türü</label>
@@ -184,7 +214,7 @@ export default function Index() {
                                             <button type='submit' disabled={isSubmitting} className={"btn btn-primary btn-block loading-button" + (isSubmitting && " loading-button")}><span>Kaydet <i className="icon-circle-right2 ml-2"></i></span></button>
                                         </div>
                                         <div className='col-md-6 col-12 mt-1'>
-                                            <button type='button' onClick={() => {  setModelOpen(!modalOpen) }} className={"btn btn-warning btn-block "}><span>Kapat <i className="fas fa-undo ml-2"></i></span></button>
+                                            <button type='button' onClick={() => { setModelOpen(!modalOpen) }} className={"btn btn-warning btn-block "}><span>Kapat <i className="fas fa-undo ml-2"></i></span></button>
                                         </div>
                                     </div>
                                 </>}
@@ -218,11 +248,11 @@ export default function Index() {
                             },
                             {
                                 header: <span>#</span>,
-                                dynamicButton: (data) => { return <a href={"firma-listesi/firma-ozellikleri/"+data.companyId}  className='btn btn-sm btn-outline-success'><i class="fa fa-trophy"></i> Özellikler </a> }
+                                dynamicButton: (data) => { return <a href={"firma-listesi/firma-ozellikleri/" + data.companyId} className='btn btn-sm btn-outline-success'><i class="fa fa-trophy"></i> Özellikler </a> }
                             },
                             {
                                 header: <span>#</span>,
-                                dynamicButton: (data) => { return <a href={"firma-listesi/resimler/"+data.companyId}   className='btn btn-sm btn-outline-info'> <i className='fas fa-file-image'></i>  Resimler </a> }
+                                dynamicButton: (data) => { return <a href={"firma-listesi/resimler/" + data.companyId} className='btn btn-sm btn-outline-info'> <i className='fas fa-file-image'></i>  Resimler </a> }
                             }
 
                         ]} Title={<span>Firma  Listesi</span>}

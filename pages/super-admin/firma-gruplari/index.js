@@ -19,9 +19,7 @@ export default function Index() {
     const [loading, setLoading] = useState(true)
     const [refreshDataTable, setRefreshDatatable] = useState(null)
     const [file, setFile] = useState(null)
-    const [group, setgroup] = useState(null)
-    const [companyGroupDDl, setCompanyGroupDdl] = useState([])
-
+    
 
 
     useEffect(() => {
@@ -29,15 +27,14 @@ export default function Index() {
         start();
     }, [])
     const start = async () => {
-        var d = await GetWithToken("companyGroup/getAll").then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
-        setCompanyGroupDdl(d.data)
+
         setLoading(false)
     }
 
     const submit = async (val) => {
         var dataId = null;
         if (val.id == undefined) {
-            var d = await PostWithToken("CompanyType/Create", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("CompanyGroup/Create", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
             if (d.isError) {
                 alert(d.message)
             } else {
@@ -46,7 +43,7 @@ export default function Index() {
             }
 
         } else {
-            var d = await PostWithToken("CompanyType/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+            var d = await PostWithToken("CompanyGroup/Edit", val).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
             if (d.isError) {
                 alert(d.message)
@@ -57,7 +54,7 @@ export default function Index() {
         if (file) {
             var d = await PostWithTokenFile("FileUpload/Upload", { name: "file", data: file }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
-            await PostWithToken("CompanyType/UploadFile", { fileName: d.data.fileName, id: dataId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+            await PostWithToken("CompanyGroup/UploadFile", { fileName: d.data.fileName, id: dataId }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
         }
 
@@ -65,7 +62,7 @@ export default function Index() {
     }
 
     const deleteData = async (data) => {
-        var d = await GetWithToken("CompanyType/delete/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+        var d = await GetWithToken("CompanyGroup/delete/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
         if (d.isError) {
             alert(d.message)
         }
@@ -75,7 +72,7 @@ export default function Index() {
 
     const deleteFile = async (fileName, id) => {
 
-        await PostWithToken("CompanyType/FileDelete", { fileName: fileName, id: id }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
+        await PostWithToken("CompanyGroup/FileDelete", { fileName: fileName, id: id }).then(x => { return x.data }).catch((e) => { AlertFunction("Başarısız işlem", "Bu işlem için yetkiniz bulunmuyor"); return false })
 
 
     }
@@ -83,12 +80,7 @@ export default function Index() {
     const editData = async (data) => {
         setFile(null)
         setHiddenPassordField(true)
-        var d = await GetWithToken("CompanyType/getById/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("", e.response.data); return false })
-        if (d.data.companyGroupId == null) {
-            setgroup(false)
-        } else {
-            setgroup(true)
-        }
+        var d = await GetWithToken("CompanyGroup/getById/" + data.id).then(x => { return x.data }).catch((e) => { AlertFunction("", e.response.data); return false })
 
 
         setInitialData(d.data)
@@ -130,9 +122,7 @@ export default function Index() {
                         }}
                         onSubmit={(values, { setSubmitting }) => {
 
-                            if (!group) {
-                                values.companyGroupId = null
-                            }
+
                             setTimeout(async () => {
                                 await submit(values)
                                 setSubmitting(false);
@@ -145,29 +135,9 @@ export default function Index() {
                                 {initialData && <>
                                     <ErrorMessage name="id" component="div" className='text-danger' />
                                     <Field type="hidden" name="id" />
-                                    <div className=' col-12  mb-3 '>
-                                        <label className='input-label'> <input type="checkbox" onChange={x => setgroup(x.target.checked)} id="name" name="name" />Bu Firma Türü Bir Gruba Ait</label>
-                                    </div>
-                                    {
-                                        group &&
-                                        <div className=' col-12  mb-3 mt-3'>
-                                            <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
-                                            <label className='input-label'>Firma Grubu</label>
-
-                                            <select className='form-control' onChange={handleChange} value={values.companyGroupId} onBlur={handleBlur} name="companyGroupId">
-                                                <option value="" >Seçiniz</option>
-                                                {companyGroupDDl.map((item, key) => {
-
-                                                    return <option value={item.id} key={key}>{item.name}</option>
-                                                })}
-                                            </select>
-                                        </div>
-                                    }
-
-
-                                    <div className=' col-12  mb-3 mt-2'>
+                                    <div className=' col-12  mb-3'>
                                         <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
-                                        <label className='input-label'>Firma Türü Adı</label>
+                                        <label className='input-label'>Firma Grup Adı</label>
                                         <Field type="text" id="name" className="form-control" name="name" />
                                     </div>
 
@@ -185,19 +155,15 @@ export default function Index() {
                                         }
 
                                         {
-                                            file == null && values.logoUrl &&
+                                            file == null && values.imageUrl &&
                                             <div className='col-12 mt-2'>
-                                                <img style={{ width: "100px" }} src={fileUploadUrl + values.logoUrl}></img>
-                                                <button type='button' className='btn btn-danger btn-sm' onClick={async () => { setFieldValue("logoUrl", null); setFile(null); await deleteFile(values.logoUrl, values.id); }} > Kaldır X</button>
+                                                <img style={{ width: "100px" }} src={fileUploadUrl + values.imageUrl}></img>
+                                                <button type='button' className='btn btn-danger btn-sm' onClick={async () => { setFieldValue("imageUrl", null); setFile(null); await deleteFile(values.logoUrl, values.id); }} > Kaldır X</button>
                                             </div>
                                         }
                                     </div>
 
-                                    <div className=' col-12  mb-3 mt-2'>
-                                        <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
-                                        <label >Menüde Gösterilsin mi? <Field type="checkbox" id="showMenu" name="showMenu" /></label>
 
-                                    </div>
 
                                     <div className='row col-12  mt-4'>
                                         <div className='col-md-6 col-12 mt-1 '>
@@ -216,9 +182,9 @@ export default function Index() {
 
 
             <Layout>
-                <PageHeader title="Firma Türleri" map={[
+                <PageHeader title="Firma Grupları" map={[
                     { url: "", name: "Super Admin" },
-                    { url: "", name: "Firma Türü Listesi" }
+                    { url: "", name: "Firma Grupları Listesi" }
                 ]}>
 
                 </PageHeader>
@@ -226,18 +192,14 @@ export default function Index() {
 
                 <div className='content pr-3 pl-3'>
                     <div className='card'>
-                        <DataTable Refresh={refreshDataTable} DataUrl={"CompanyType/GetCompanyType"} Headers={[
-                            ["name", "Firma Türü Adı"],
-                            ["companyGroupName", "Bağlı Olduğu Grup"],
-                            ["companyCount", "Firma Sayısı"],
-                            {
-                                header: "Anasayfa Gösterim",
-                                dynamicButton: (data) => {  var ds=data.showMenu && <button className='btn btn-sm btn-success' title='Detay'> Gösteriliyor </button>;  return ds  }
-                            }
-                        ]} Title={<span>Firma Türü Listesi</span>}
-                            Description={"Firma Türü kayıtlarında düzenleme ve ekleme işlemini burdan yapabilirsiniz"}
+                        <DataTable Refresh={refreshDataTable} DataUrl={"CompanyGroup/GetAll"} Headers={[
+                            ["name", "Firma Grup Adı"],
+                            ["CompaniesLength", "Firma Sayısı"],
+
+                        ]} Title={<span>Firma Grup Listesi</span>}
+                            Description={"Firma grubu kayıtlarında düzenleme ve ekleme işlemini burdan yapabilirsiniz"}
                             HeaderButton={{
-                                text: "Firma Türü Ekle", action: () => {
+                                text: "Firma Grubu Ekle", action: () => {
                                     setModelOpen(!modalOpen)
                                     setInitialData({})
                                 }

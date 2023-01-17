@@ -1589,13 +1589,12 @@ thead {
 
 form .input-label {
     position: absolute;
-    top: -17px;
+    top: -22px;
     left: 13px;
     background: white;
     margin: 5px;
     padding: 0px 8px 0 7px;
     border-radius: 5px;
-    z-index: 1;
     height: 19px;
     font-weight: bold;
 
@@ -2081,7 +2080,7 @@ select, input[type="datetime-local"], input[type="date"], input[type="text"], in
 
 .modal-close-button {
     position: absolute;
-    top: 6px;
+    top: 25px;
     height: 25px;
     line-height: 13px;
     right: 10px;
