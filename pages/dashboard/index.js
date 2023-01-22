@@ -7,7 +7,7 @@ import Layout from '../../layout/layout'
 import PageHeader from '../../layout/pageheader'
 
 
-export default function index() {
+export default function Index() {
   const [documentTypeYear, setDocumentTypeYear] = useState(new Date().getFullYear())
 
   const [docApCartYear, setDocApCartYear] = useState(new Date().getFullYear())

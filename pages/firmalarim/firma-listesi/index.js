@@ -248,7 +248,7 @@ export default function Index() {
                             },
                             {
                                 header: <span>#</span>,
-                                dynamicButton: (data) => { return <a href={"firma-listesi/firma-ozellikleri/" + data.companyId} className='btn btn-sm btn-outline-success'><i class="fa fa-trophy"></i> Özellikler </a> }
+                                dynamicButton: (data) => { return <a href={"firma-listesi/firma-ozellikleri/" + data.companyId} className='btn btn-sm btn-outline-success'><i className="fa fa-trophy"></i> Özellikler </a> }
                             },
                             {
                                 header: <span>#</span>,

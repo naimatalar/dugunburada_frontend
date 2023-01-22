@@ -106,7 +106,7 @@ export default function Index() {
 
 
             <Modal isOpen={modalOpen}
-                size="sm"
+                size="md"
                 toggle={() => setModelOpen(!modalOpen)}
                 modalTransition={{ timeout: 100 }}>
                 <ModalHeader cssModule={{ 'modal-title': 'w-100 text-center' }}>
@@ -170,7 +170,11 @@ export default function Index() {
                                         <label className='input-label'>Firma Türü Adı</label>
                                         <Field type="text" id="name" className="form-control" name="name" />
                                     </div>
-
+                                    <div className=' col-12  mb-3 mt-2'>
+                                        <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
+                                        <label className='input-label'>Url Adı</label>
+                                        <Field type="text" id="urlName" className="form-control" name="urlName" />
+                                    </div>
 
                                     <div className='col-md-6 col-12 mb-3'>
                                         {/* <ErrorMessage name="phone" component="div" className='text-danger danger-alert-form' /> */}
@@ -198,6 +202,13 @@ export default function Index() {
                                         <label >Menüde Gösterilsin mi? <Field type="checkbox" id="showMenu" name="showMenu" /></label>
 
                                     </div>
+
+                                    <div className=' col-12  mb-3 mt-2'>
+                                        <ErrorMessage name="name" component="div" className='text-danger danger-alert-form' />
+                                        <label className='input-label'>Açıklama</label>
+                                        <textarea rows={4} onBlur={handleBlur} onChange={handleChange} value={values.description} id="description" className="form-control" name="description" />
+                                    </div>
+                                
 
                                     <div className='row col-12  mt-4'>
                                         <div className='col-md-6 col-12 mt-1 '>
@@ -230,6 +241,7 @@ export default function Index() {
                             ["name", "Firma Türü Adı"],
                             ["companyGroupName", "Bağlı Olduğu Grup"],
                             ["companyCount", "Firma Sayısı"],
+                            ["urlName", "Url Adı"],
                             {
                                 header: "Anasayfa Gösterim",
                                 dynamicButton: (data) => {  var ds=data.showMenu && <button className='btn btn-sm btn-success' title='Detay'> Gösteriliyor </button>;  return ds  }
